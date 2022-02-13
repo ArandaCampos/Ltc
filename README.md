@@ -41,14 +41,11 @@
     # Entrar no diretório
     $ cd Ltc/usr
 
-    # Para executá-lo localmente
+    # Para executá-lo através do bash
     $ bash ltc --verion
 
-    # Tornar executável globalmente
-    $ chmod u+x ltc
-
-    # Para confirmar se tudo ocorreu bem
-    $ ltc --verison
+    # Para torná-lo executável
+    $ chmod u+x ltc || ltc --version
 
 
 E está pronto para usá-lo 👨‍💻

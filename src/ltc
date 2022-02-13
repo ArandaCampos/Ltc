@@ -4,14 +4,19 @@
 # Este script adiciona, consulta, e excluí palavras com alguma relação
 #
 # Versão 1.0
+#       -h  Help
+#       -v  Versão
+#       -n  Adiciona a lista
+#       -s  Busca na lista
+#       -r  Remove um item da lista
+#       -R  Exclui toda a lista
+#       -a  Imprime toda a lista
 #
-# Futuras melhorias:
-#       Não permitir que dados idêntico sejam mostrados
 
 # declaração de variáveis
 LIST=~/.list
-VERSION="Versão 1.0"
-CABECALHO="Uso:\tltc [OPÇÃO] [ARGUMENTO]
+VERSION=" $(basename "$0") Versão 1.0"
+CABECALHO="Uso:\t$(basename "$0") [OPÇÃO] [ARGUMENTO]
 \tPrograma adiciona, remove e consulta dados correlacionados\n\n"
 ARG_TXT="OPÇÕES
 
@@ -21,94 +26,59 @@ COM ARGUMENTOS OBRIGATÓRIOS
 \t -s, --search\tBusca na lista os dados correlacionados ao parâmetro passado
 
 SEM ARGUMENTOS
-\t -R, --allremove\tRemove todos os itens da lista
+\t -R, --removeall\tRemove todos os itens da lista
 \t -a, --allprint\tImprime todos os dados existente
 \t -v, --version\tExibe a versão atual"
-CONT=1
-# Caso não haja parâmetros
+
+CONT=1      # Contador
+ARG=0       # Verificar se existe argumento
+SOURCE=0    # Buscar na lista
+NEW=0       # Adicionar
+DELETE=0    # Deletar
+EXISTE=0    # Existe ou não o argumento na lista
+
+# Caso não haja opções
 if [ $# -lt 1 ] ; then
     echo -e "É necessário informar uma opção para funcionar\n"
     echo -e "$ARG_TXT"
     exit 1
 fi
 
-# Caso o parâmetro seja
+# verifica se o arquivo $LIST existe
+# caso não exista, cria
+[ -s $LIST ]
+if [ $? -eq 1 ] ; then
+    touch $LIST
+fi
+
+# Caso a opção seja
 case $1 in
     # --Help
-    "--help" | "-h" )
-        echo -e "$CABECALHO"
-        echo -e "$ARG_TXT"
-        ;;
+    "--help" | "-h" ) echo -e "$CABECALHO\n$ARG_TXT" ;;
     # --Version
-    "--version" | "-v" )
-        echo -e $VERSION
-        ;;
+    "--version" | "-v" ) echo -e $VERSION ;;
     # --New
     "--new" | "-n" )
-        # caso não tenha argumentos
-        if [ $# -lt 2 ] ; then
-            echo -e "Ltc necessita de argumentos para funcionar\n"
-            echo -e "$CABECALHO\n$ARG_TXT"
-            exit 1
-        fi
-        # concatena os dados
-        for i in $@ ; do
-            if [ $CONT -gt 1 ] ; then
-                FRASE+=${i}
-                FRASE+=" "
-            fi
-            let CONT+=1
-        done
-        echo $FRASE >> $LIST
-        echo $FRASE foram adicionados com sucesso
+        ARG=1
+        SOURCE=1
+        NEW=1
         ;;
     # --Search
     "--search" | "-s" )
-        # caso não tenha argumentos
-        if [ $# -lt 2 ] ; then
-            echo -e "Ltc necessita de argumentos para funcionar\n"
-            echo -e "$CABECALHO\n$ARG_TXT"
-            exit 1
-        fi
-        # verifica se o arquivo $LIST existe
-        [ -s $LIST ]
-        # caso não exista, retorna 1
-        if [ $? -eq 1 ] ; then
-            echo "Lista está vazia"
-            exit 1
-        fi
-        # Busca o argumento na lista
-        grep -i -q "$2" $LIST
-        # caso não exista, imprime e retorna 1
-        if [ $? -ne 0 ] ; then
-            echo "Dado(s) inexistente(s)"
-            exit 1
-        # caso exista o dado, imprime e retorna 0
-        else
-            grep -i "$2" $LIST
-        fi
+        ARG=1
+        SOURCE=1
         ;;
     # --Remove
     "--remove" | "-r" )
-        # caso não tenha argumentos
-        if [ $# -lt 2 ] ; then
-            echo -e "Ltc necessita de argumentos para funcionar\n"
-            echo -e "$CABECALHO\n$ARG_TXT"
-            exit 1
-        fi
-        # recebe o número da linha que contem o dado
-        LINHA=$(grep -n $2 $LIST | cut -d':' -f1)
-        # caso o dado não exista, retorna 1
-        if [ -z "$LINHA" ]; then
-            echo "Dado(s) inexistente(s)"
-            exit 1
-        fi
-        sed -i "/${2}/d" $LIST
-        echo "Excluido(s) com sucesso"
+        ARG=1
+        SOURCE=1
+        DELETE=1
         ;;
+    # --Allremove
     "--allremove" | "-R" )
         rm $LIST
         ;;
+    # --Allprint
     "--allprint" | "-a" )
         cat $LIST
         ;;
@@ -117,5 +87,61 @@ case $1 in
         exit 1
         ;;
 esac
+
+# verifica se possuie argumentos
+if [ $ARG -eq 1 ] ; then
+    if [ $# -lt 2 ] ; then
+        echo -e "Ltc necessita de argumentos para funcionar\n"
+        echo -e "$CABECALHO\n$ARG_TXT"
+        exit 1
+    fi
+fi
+
+# Busca o argumento na lista
+# caso exista, imprime e atribui 1 a EXISTE
+if [ $SOURCE -eq 1 ] ; then
+    grep -i --silent "$2" $LIST
+    if [ $? -eq 0 ] ; then
+        EXISTE=1
+        grep -i "$2" $LIST
+    fi
+fi
+
+# concatena os argumento e adiciona-os na lista
+if [ $NEW -eq 1 ] ; then
+    if [ $EXISTE -eq 0 ] ; then
+        for i in $@ ; do
+            if [ $CONT -gt 1 ] ; then
+                FRASE+=${i}
+                FRASE+=" "
+            fi
+            let CONT+=1
+        done
+        echo $FRASE >> $LIST
+        if [ $? -eq 0 ] ; then
+            echo $FRASE foram adicionados com sucesso
+        else
+            exit 1
+        fi
+    else
+        echo "Dados já existentes"
+    fi
+fi
+
+# Deleta os dados correlacionados ao argumento
+if [ $DELETE -eq 1 ] ; then
+    if [ $EXISTE -eq 1 ] ; then
+        # recebe o número da linha que contem o dado
+        LINHA=$(grep -n $2 $LIST | cut -d':' -f1)
+        sed -i "/${2}/d" $LIST
+        if [ $? -eq 0 ] ; then
+            echo "Excluido(s) com sucesso"
+        else
+            echo "Os dados não puderam ser excluídos"
+        fi
+    else
+        echo "Dados inexistentes"
+    fi
+fi
 
 exit 0

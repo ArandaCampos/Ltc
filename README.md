@@ -36,7 +36,7 @@
 ## Instalação
 
     # Clonar o repositório
-    $ git clone https://github.com/ArandaCampos/Config-Neovim.git
+    $ git clone https://github.com/ArandaCampos/Ltc.git
 
     # Entrar no diretório
     $ cd Ltc/usr
@@ -48,5 +48,5 @@
     $ chmod u+x ltc || ltc --version
 
 
-E está pronto para usá-lo 👨‍💻
+E está pronto para usá-lo 💻
 

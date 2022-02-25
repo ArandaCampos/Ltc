@@ -2,7 +2,7 @@
 
 ![Badge de licença](http://img.shields.io/static/v1?label=LICENÇA&message=GNU&color=sucess&style=for-the-badge)   ![Badge em Desenvolvimento](http://img.shields.io/static/v1?label=STATUS&message=CONCLUÍDO&color=sucess&style=for-the-badge)   ![Badge versionamento](http://img.shields.io/static/v1?label=VERSAO&message=1.0&color=sucess&style=for-the-badge)
 
-&emsp;O projeto nasceu da necessidade que eu tinha de armazenar e consultar pequenas informações durante o meu dia, como comandos bash, <strong>OS DIVERSOS PARÂMETROS DO GCC </strong>, bibliotecas específicas, entre outras. Pensando nisso, o <strong>ltc</strong> armazena qualquer tipo de dado sem nenhum critério e, para consultá-lo, basta informar uma palavra chave ou parte do dado em que deseja buscar<br>
+&emsp;O projeto nasceu da necessidade que eu tinha de armazenar e consultar pequenas informações durante o meu dia, como comandos bash, <strong>OS DIVERSOS PARÂMETROS DE COMPILAÇÃO </strong>, bibliotecas específicas, entre outras. Pensando nisso, o <strong>ltc</strong> armazena qualquer tipo de dado sem nenhum critério e, para consultá-lo, basta informar uma palavra chave ou parte do dado em que deseja buscar<br>
 &emsp;Vale destacar que este script Shell <strong>não criptografa os dados</strong>, portanto, não deve ser usado para guardar dados sensíveis!
 
 ## Modo de usar
